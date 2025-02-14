@@ -1,32 +1,45 @@
 #include "philo.h"
 
-int		mails = 0;
+int		balance = 0;
 
-void    *f1()
+int		read_balance()
 {
-	for (int i = 0; i < 100000; i++)
-		mails++;
+	usleep(250000);
+	return (balance);
+}
+
+void	write_balance(int new_balance)
+{
+	usleep(250000);
+	balance = new_balance;
+}
+
+void	*deposit(void *amount)
+{
+	int		acc_amount;
+
+	acc_amount = read_balance();
+	acc_amount += *((int *)amount);
+	write_balance(acc_amount);
 
 	return NULL;
 }
 
-void    *f2()
+int		main()
 {
-	printf("philo 2\n");
-	sleep(1);
-	printf("2 Ended\n");
-	return NULL;
-}
+	printf("before: %d\n", read_balance());
 
-int     main()
-{
 	pthread_t	t1;
 	pthread_t	t2;
 
-	pthread_create(&t1, NULL, &f1, NULL);
-	pthread_create(&t2, NULL, &f1, NULL);
+	int		v1 = 300;
+	int		v2 = 200;
+
+	pthread_create(&t1, NULL, deposit, (void *) &v1);
+	pthread_create(&t2, NULL, deposit, (void *) &v2);
 	pthread_join(t1, NULL);
 	pthread_join(t2, NULL);
-	// printf("%d\n", mails);
+
+	printf("after: %d\n", read_balance());
 	return (0);
 }
