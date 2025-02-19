@@ -2,10 +2,12 @@
 
 pthread_mutex_t		mutex;
 
-void	*add(void *i)
+void	*add(void *d)
 {
 	pthread_mutex_lock(&mutex);
-	printf("%d thinking\n", *((int *)i));
+	printf("%d ", ((t_data *)d)->philo.id);
+	printf("thinking\n");
+
 
 	pthread_mutex_unlock(&mutex);
 	return NULL;
@@ -13,24 +15,26 @@ void	*add(void *i)
 
 int		main()
 {
-	pthread_t	t[4];
+	t_data		d[4];
 	int		i;
-	int		*a;
+	// pthread_t	thread[4];
 
+	// if (parse_data(ac, av) != 0)
+	// 	return (0);
 	pthread_mutex_init(&mutex, NULL);
 	i = 0;
 	while (i < 3)
 	{
-		a = malloc(sizeof(int));
-		*a = i;
-		if (pthread_create(&t[i], NULL, add, a) != 0)
+		d[i].philo.id = i;
+		if (pthread_create(&d[i].philo.thread, NULL, add, &d[i]) != 0)
 			return (perror("fail"), 1);
+		// exit(1);
 		i++;
 	}
 	i = 0;
 	while (i < 3)
 	{
-		if (pthread_join(t[i], NULL) != 0)
+		if (pthread_join(d[i].philo.thread, NULL) != 0)
 			return (perror("fail"), 1);
 		i++;
 	}
