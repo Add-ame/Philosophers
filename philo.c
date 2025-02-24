@@ -2,82 +2,87 @@
 
 pthread_mutex_t		mutex;
 
-int		ii = 0;
 
-
-void	*add(void *d)
+/**
+ * 1 2 3 4 5 philos
+ * |\
+ * 1 2 3 4 5 forks
+ *
+ * philos 1 picks up fork 1
+ * 
+ * 
+ */
+void	*add(void *data)
 {
-	int		flag;
+	t_philo	*p;
 
-	flag = 0;
-	pthread_mutex_lock(&mutex);
+	p = (t_philo *)data;
 
-	pthread_mutex_lock(&((t_data *)d)->fork[((t_data *)d)->philo[ii].idx - 1]);
-	printf("%d ", ((t_data *)d)->philo[ii].idx);
-	printf("1 fork\n");
-	flag++;
-	pthread_mutex_unlock(&((t_data *)d)->fork[((t_data *)d)->philo[ii++].idx - 1]);
-
-	pthread_mutex_lock(&((t_data *)d)->fork[((t_data *)d)->philo[ii].idx - 1]);
-	printf("%d ", ((t_data *)d)->philo[ii - 1].idx);
-	printf("2 fork\n");
-	flag++;
-	pthread_mutex_unlock(&((t_data *)d)->fork[((t_data *)d)->philo[ii++].idx - 1]);
-	if (flag == 2)
+	while (1)
 	{
+		printf("%d ", p->idx);
+		printf("thinking\n");
+		usleep(p->plate.time_to_eat * 1000);
+		pthread_mutex_lock(&mutex);
+		pthread_mutex_lock(&p->left_fork);
+		printf("%d ", p->idx);
+		printf("Left fork tacked\n");
+		pthread_mutex_lock(p->right_fork);
+		printf("%d ", p->idx);
+		printf("Right fork tacked\n");
+		pthread_mutex_unlock(&p->left_fork);
+		pthread_mutex_unlock(p->right_fork);
+		printf("%d ", p->idx);
 		printf("eating\n");
-		usleep(((t_data *)d)->time_to_eat);
-	}
+		usleep(p->plate.time_to_eat * 1000);
+		printf("%d ", p->idx);
+		printf("sleeping\n");
+		usleep(p->plate.time_to_sleep * 1000);
 
-	pthread_mutex_unlock(&mutex);
+		pthread_mutex_unlock(&mutex);
+	}
 	return NULL;
 }
 
-void	init(t_data *d, int ac, char **av)
+void	init(t_philo *p, int ac, char **av, int i)
 {
-	int		i;
+	// int		i;
 
 	if (ac != 5 && ac != 6)
 		exit(22);
-	d->num_philos = atoi(av[1]);
-	d->time_to_die = atoi(av[2]);
-	d->time_to_eat = atoi(av[3]);
-	d->time_to_sleep = atoi(av[4]);
-	if (ac == 6)
-		d->must_eat_time = atoi(av[5]);
 
-	i = 0;
-	while (i <= d->num_philos)
-	{
-		d->philo[i].idx = i + 1;
-		d->philo[i].last_meal_time = 0;
-		d->philo[i].meals_eaten = 0;
-		i++;
-	}
+	p->plate.num_philos = atoi(av[1]);
+	p->plate.time_to_die = atoi(av[2]);
+	p->plate.time_to_eat = atoi(av[3]);
+	p->plate.time_to_sleep = atoi(av[4]);
+	if (ac == 6)
+		p->plate.must_eat_time = atoi(av[5]);
+
+	p->idx = i + 1;
 }
 
 int		main(int ac, char **av)
 {
-	t_data		d;
+	t_philo		p[200];
 	int		i;
 
-	init(&d, ac, av);
 	pthread_mutex_init(&mutex, NULL);
 	i = 0;
-	while (i < 5)
+	while (i < 10)
 	{
-		pthread_mutex_init(&d.fork[i], NULL);
-		// exit(1);
-		if (pthread_create(&d.philo[i].thread, NULL, add, &d) != 0)
+		init(&p[i], ac, av, i);
+		pthread_mutex_init(&p[i].left_fork, NULL);
+		p[i].right_fork = &p[(i + 1) % p[i].plate.num_philos].left_fork;
+		if (pthread_create(&p[i].thread, NULL, add, &p[i]) != 0)
 			return (perror("fail"), 1);
 		i++;
 	}
 	i = 0;
-	while (i < 5)
+	while (i < 10)
 	{
-		if (pthread_join(d.philo[i].thread, NULL) != 0)
+		if (pthread_join(p[i].thread, NULL) != 0)
 			return (perror("fail"), 1);
-		pthread_mutex_destroy(&d.fork[i]);
+		pthread_mutex_destroy(&p[i].left_fork);
 		i++;
 	}
 	pthread_mutex_destroy(&mutex);
