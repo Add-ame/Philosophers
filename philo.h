@@ -26,18 +26,22 @@ typedef	struct s_data
 	int		time_to_eat;
 	int		time_to_sleep;
 	int		simulation_end;
-	int		must_eat_time;
+	int		must_eat_num;
 }	t_plate;
 
 typedef struct s_philo
 {
+	long	start_time;
 	int		idx;
+	int		real_time;
+	int		meals_eaten;
+	long	last_meal_time;
 	t_plate		plate;
 	pthread_t	thread;
+	pthread_mutex_t	print;
 	pthread_mutex_t	left_fork;
 	pthread_mutex_t	*right_fork;
 }   t_philo;
-
 
 
 #endif
