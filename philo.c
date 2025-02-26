@@ -16,8 +16,6 @@ long	get_real_time()
  * 1 2 3 4 5 philos
  * |\
  * 1 2 3 4 5 forks
- *
- * philos 1 picks up fork 1
  * 
  * 
  */
@@ -28,6 +26,12 @@ void	*add(void *data)
 	p = (t_philo *)data;
 
 	p->start_time = get_real_time();
+	if (p->idx % 2 == 0 || p->idx == p->plate.num_philos)
+	{
+		printf("%ld %d is thinking\n", get_real_time() - p->start_time ,p->idx);
+		usleep(1000);
+	}
+
 	while (1)
 	{
 		pthread_mutex_lock(&p->left_fork);
@@ -41,10 +45,9 @@ void	*add(void *data)
 		pthread_mutex_unlock(&p->print);
 		p->meals_eaten++;
 		p->last_meal_time = get_real_time();
-		usleep(p->plate.time_to_eat * 1000);
 		pthread_mutex_unlock(&p->left_fork);
+		usleep(p->plate.time_to_eat * 1000);
 		pthread_mutex_unlock(p->right_fork);
-
 
 		pthread_mutex_lock(&p->print);
 		printf("%ld %d is sleeping\n", get_real_time() - p->start_time ,p->idx);
@@ -55,7 +58,6 @@ void	*add(void *data)
 		printf("%ld %d is thinking\n", get_real_time() - p->start_time ,p->idx);
 		usleep(p->plate.time_to_eat * 1000);
 		pthread_mutex_unlock(&p->print);
-
 		if (p->plate.must_eat_num == p->meals_eaten)
 			break;
 	}
