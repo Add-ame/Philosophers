@@ -42,32 +42,24 @@ void	*add(void *data)
 			exit(1);
 		}
 		pthread_mutex_lock(&p->left_fork);
-		pthread_mutex_lock(&p->print);
 		printf("%ld %d has taken a fork\n", get_real_time() - p->start_time ,p->idx);
-		pthread_mutex_unlock(&p->print);
 		pthread_mutex_lock(p->right_fork);
-		pthread_mutex_lock(&p->print);
 		printf("%ld %d has taken a fork\n", get_real_time() - p->start_time ,p->idx);
 		printf("%ld %d is eating\n", get_real_time() - p->start_time ,p->idx);
-		pthread_mutex_unlock(&p->print);
 		p->meals_eaten++;
 		p->last_meal_time = get_real_time();
 		usleep(p->plate.time_to_eat * 1000);
 		pthread_mutex_unlock(&p->left_fork);
 		pthread_mutex_unlock(p->right_fork);
 
-		pthread_mutex_lock(&p->print);
 		printf("%ld %d is sleeping\n", get_real_time() - p->start_time ,p->idx);
-		pthread_mutex_unlock(&p->print);
 		usleep(p->plate.time_to_sleep * 1000);
 
 		if (p->plate.must_eat_num == p->meals_eaten)
 			break;
 
-		pthread_mutex_lock(&p->print);
 		printf("%ld %d is thinking\n", get_real_time() - p->start_time ,p->idx);
 		usleep(p->plate.time_to_eat * 1000);
-		pthread_mutex_unlock(&p->print);
 
 	}
 	return NULL;
@@ -94,10 +86,13 @@ void	init(t_philo *p, int ac, char **av, int i)
 
 int		main(int ac, char **av)
 {
-	t_philo		p[200];
+	t_philo		*p;
 	int		i;
+	int		num;
 
 	i = 0;
+	num = atoi(av[1]);
+	p = malloc(sizeof(t_philo) * num);
 	init(&p[0], ac, av, i);
 	while (i < p[0].plate.num_philos)
 	{
