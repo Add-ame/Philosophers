@@ -27,6 +27,7 @@ typedef	struct s_data
 	int		time_to_sleep;
 	int		simulation_end;
 	int		must_eat_num;
+	pthread_mutex_t	mutex;
 }	t_plate;
 
 typedef struct s_philo
