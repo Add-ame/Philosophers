@@ -28,7 +28,7 @@ void	*add(void *data)
 	if (p->idx % 2 == 0 || p->idx == p->plate.num_philos)
 	{
 		printf("%d %d is thinking\n", 0,p->idx);
-		usleep(100);
+		usleep(1000);
 	}
 
 	p->start_time = get_real_time();
@@ -36,11 +36,7 @@ void	*add(void *data)
 	while (1)
 	{
 		if (get_real_time() - p->last_meal_time > p->plate.time_to_die)
-		{
-			printf("%ld %d is eating\n", get_real_time() - p->start_time ,p->idx);
-			printf("%ld\n", get_real_time() - p->start_time);
 			exit(1);
-		}
 		pthread_mutex_lock(&p->left_fork);
 		pthread_mutex_lock(&p->print);
 		printf("%ld %d has taken a fork\n", get_real_time() - p->start_time ,p->idx);
@@ -56,18 +52,22 @@ void	*add(void *data)
 		pthread_mutex_unlock(&p->left_fork);
 		pthread_mutex_unlock(p->right_fork);
 
+		if (get_real_time() - p->last_meal_time > p->plate.time_to_die)
+			exit(1);
 		pthread_mutex_lock(&p->print);
 		printf("%ld %d is sleeping\n", get_real_time() - p->start_time ,p->idx);
-		pthread_mutex_unlock(&p->print);
 		usleep(p->plate.time_to_sleep * 1000);
+		pthread_mutex_unlock(&p->print);
 
 		if (p->plate.must_eat_num == p->meals_eaten)
-			break;
+			return (NULL);
 
 		pthread_mutex_lock(&p->print);
 		printf("%ld %d is thinking\n", get_real_time() - p->start_time ,p->idx);
-		usleep(p->plate.time_to_eat * 1000);
+		// usleep(p->plate.time_to_eat * 1000);
 		pthread_mutex_unlock(&p->print);
+		if (get_real_time() - p->last_meal_time > p->plate.time_to_die)
+			exit(1);
 
 	}
 	return NULL;
