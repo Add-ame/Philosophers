@@ -33,6 +33,7 @@ typedef	struct s_data
 typedef struct s_philo
 {
 	long	start_time;
+	int		die;
 	int		idx;
 	int		real_time;
 	int		meals_eaten;
@@ -40,6 +41,7 @@ typedef struct s_philo
 	t_plate		plate;
 	pthread_t	thread;
 	pthread_mutex_t	print;
+	pthread_mutex_t	update;
 	pthread_mutex_t	left_fork;
 	pthread_mutex_t	*right_fork;
 }   t_philo;
