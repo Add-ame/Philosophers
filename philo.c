@@ -1,7 +1,5 @@
 #include "philo.h"
 
-pthread_mutex_t		mutex;
-
 long	get_real_time()
 {
 	struct timeval	current_time;
@@ -14,7 +12,7 @@ int		simulation_end(t_philo *p, int flag)
 {
 	if (flag == CHECK_STARVED)
 	{
-		if (get_real_time() - p->last_meal_time > p->plate.time_to_die)
+		if (get_real_time() - p->last_meal_time >= p->plate.time_to_die)
 		{
 			p->die = STARVED;
 			return (STARVED);
@@ -39,24 +37,22 @@ void	*add(void *data)
 
 	if (p->idx % 2 == 0 || p->idx == p->plate.num_philos)
 	{
-		printf("%d %d is thinking\n", 0,p->idx);
+		printf("%ld %d is thinking\n", get_real_time() - p->start_time,p->idx);
 		usleep(1000);
 	}
-	p->start_time = get_real_time();
-	p->last_meal_time = get_real_time();
 	while (1)
 	{
 		if (simulation_end(p, CHECK_STARVED) == STARVED)
 			return (NULL);
 		pthread_mutex_lock(&p->left_fork);
-		pthread_mutex_lock(&p->print);
+		pthread_mutex_lock(p->print);
 		printf("%ld %d has taken a fork\n", get_real_time() - p->start_time ,p->idx);
-		pthread_mutex_unlock(&p->print);
+		pthread_mutex_unlock(p->print);
 		pthread_mutex_lock(p->right_fork);
-		pthread_mutex_lock(&p->print);
+		pthread_mutex_lock(p->print);
 		printf("%ld %d has taken a fork\n", get_real_time() - p->start_time ,p->idx);
 		printf("%ld %d is eating\n", get_real_time() - p->start_time ,p->idx);
-		pthread_mutex_unlock(&p->print);
+		pthread_mutex_unlock(p->print);
 		pthread_mutex_lock(&p->update);
 		p->meals_eaten++;
 		p->last_meal_time = get_real_time();
@@ -65,25 +61,22 @@ void	*add(void *data)
 		pthread_mutex_unlock(&p->left_fork);
 		pthread_mutex_unlock(p->right_fork);
 
-		pthread_mutex_lock(&p->print);
+		pthread_mutex_lock(p->print);
 		printf("%ld %d is sleeping\n", get_real_time() - p->start_time ,p->idx);
+		pthread_mutex_unlock(p->print);
 		usleep(p->plate.time_to_sleep * 1000);
-		pthread_mutex_unlock(&p->print);
 
-		if (!(p->idx % 2) && simulation_end(p, CHECK_FULL) == FULL)
-			return (NULL);
+		if (simulation_end(p, CHECK_STARVED) == STARVED || simulation_end(p, CHECK_FULL) == FULL)
+			return (NULL); // 200
 
-		pthread_mutex_lock(&p->print);
+		pthread_mutex_lock(p->print);
 		printf("%ld %d is thinking\n", get_real_time() - p->start_time ,p->idx);
-		pthread_mutex_unlock(&p->print);
-
-		if (p->idx % 2 && simulation_end(p, CHECK_FULL) == FULL)
-			return (NULL);
+		pthread_mutex_unlock(p->print);
 	}
 	return NULL;
 }
 
-void	init(t_philo *p, int ac, char **av, int i)
+void	init(t_philo *p, int ac, char **av, int i, pthread_mutex_t *mutex)
 {
 	// int		i;
 
@@ -100,6 +93,9 @@ void	init(t_philo *p, int ac, char **av, int i)
 	p->idx = i + 1;
 	p->real_time = get_real_time();
 	p->meals_eaten = 0;
+	p->print = mutex;
+	p->start_time = get_real_time();
+	p->last_meal_time = get_real_time();
 }
 
 int		died(t_philo *p)
@@ -132,16 +128,16 @@ int		main(int ac, char **av)
 	t_philo		*p;
 	int		i;
 	int		num;
+	pthread_mutex_t mutex;
 
 	i = 0;
+	pthread_mutex_init(&mutex, NULL);
 	num = atoi(av[1]);
 	p = malloc(sizeof(t_philo) * num);
-	init(&p[0], ac, av, i);
-	while (i < p[0].plate.num_philos)
+	while (i < num)
 	{
-		init(&p[i], ac, av, i);
+		init(&p[i], ac, av, i, &mutex);
 		pthread_mutex_init(&p[i].left_fork, NULL);
-		pthread_mutex_init(&p[i].print, NULL);
 		p[i].right_fork = &p[(i + 1) % p[i].plate.num_philos].left_fork;
 		if (pthread_create(&p[i].thread, NULL, add, &p[i]) != 0)
 			return (perror("fail"), 1);
@@ -153,10 +149,15 @@ int		main(int ac, char **av)
 	{
 		if (pthread_join(p[i].thread, NULL) != 0)
 			return (perror("fail"), 1);
-		pthread_mutex_destroy(&p[i].left_fork);
-		pthread_mutex_destroy(&p[i].print);
 		i++;
 	}
+	i = 0;
+	while (i < p[0].plate.num_philos)
+	{
+		pthread_mutex_destroy(&p[i].left_fork);
+		i++;
+	}
+	pthread_mutex_destroy(&mutex);
 	if (died(p))
 		return (free(p), 1);
 	free(p);
