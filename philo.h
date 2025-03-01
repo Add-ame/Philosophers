@@ -7,7 +7,10 @@
 #include <pthread.h>
 #include <sys/time.h>
 
-
+# define STARVED 1
+# define FULL 2
+# define CHECK_STARVED 1
+# define CHECK_FULL 2
 
 typedef enum {
 	def,
