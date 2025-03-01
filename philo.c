@@ -5,20 +5,32 @@ pthread_mutex_t		mutex;
 long	get_real_time()
 {
 	struct timeval	current_time;
-	long			real;
 
 	gettimeofday(&current_time, NULL);
-	real = (current_time.tv_sec * 1000) + (current_time.tv_usec / 1000);
-	return (real);
+	return ((current_time.tv_sec * 1000) + (current_time.tv_usec / 1000));
 }
 
-/**
- * 1 2 3 4 5 philos
- * |\
- * 1 2 3 4 5 forks
- * 
- * 
- */
+int		simulation_end(t_philo *p, int flag)
+{
+	if (flag == CHECK_STARVED)
+	{
+		if (get_real_time() - p->last_meal_time > p->plate.time_to_die)
+		{
+			p->die = STARVED;
+			return (STARVED);
+		}
+	}
+	else if (flag == CHECK_FULL)
+	{
+		if (p->meals_eaten == p->plate.must_eat_num)
+		{
+			p->die = FULL;
+			return (FULL);
+		}
+	}
+	return (0);
+}
+
 void	*add(void *data)
 {
 	t_philo	*p;
@@ -30,16 +42,12 @@ void	*add(void *data)
 		printf("%d %d is thinking\n", 0,p->idx);
 		usleep(1000);
 	}
-
 	p->start_time = get_real_time();
 	p->last_meal_time = get_real_time();
 	while (1)
 	{
-		if (get_real_time() - p->last_meal_time > p->plate.time_to_die)
-		{
-			p->die = 1;
+		if (simulation_end(p, CHECK_STARVED) == STARVED)
 			return (NULL);
-		}
 		pthread_mutex_lock(&p->left_fork);
 		pthread_mutex_lock(&p->print);
 		printf("%ld %d has taken a fork\n", get_real_time() - p->start_time ,p->idx);
@@ -57,31 +65,20 @@ void	*add(void *data)
 		pthread_mutex_unlock(&p->left_fork);
 		pthread_mutex_unlock(p->right_fork);
 
-		if (get_real_time() - p->last_meal_time > p->plate.time_to_die)
-		{
-			p->die = 1;
-			return (NULL);
-		}
 		pthread_mutex_lock(&p->print);
 		printf("%ld %d is sleeping\n", get_real_time() - p->start_time ,p->idx);
 		usleep(p->plate.time_to_sleep * 1000);
 		pthread_mutex_unlock(&p->print);
 
-		if (p->plate.must_eat_num == p->meals_eaten)
-		{
-			p->die = 2;
+		if (!(p->idx % 2) && simulation_end(p, CHECK_FULL) == FULL)
 			return (NULL);
-		}
 
 		pthread_mutex_lock(&p->print);
 		printf("%ld %d is thinking\n", get_real_time() - p->start_time ,p->idx);
 		pthread_mutex_unlock(&p->print);
-		if (get_real_time() - p->last_meal_time > p->plate.time_to_die)
-		{
-			p->die = 1;
-			return (NULL);
-		}
 
+		if (p->idx % 2 && simulation_end(p, CHECK_FULL) == FULL)
+			return (NULL);
 	}
 	return NULL;
 }
@@ -114,10 +111,16 @@ int		died(t_philo *p)
 		i = 0;
 		while (i < p->plate.num_philos)
 		{
-			if (p->die == 1)
-				return 1;
-			if (p->die == 2)
-				return 2;
+			if (p->die == STARVED)
+			{
+				printf("Die\n");
+				return (STARVED);
+			}
+			if (p->die == FULL)
+			{
+				printf("Rahom cheb3o\n");
+				return (FULL);
+			}
 			i++;
 		}
 	}
@@ -145,7 +148,6 @@ int		main(int ac, char **av)
 		i++;
 	}
 
-
 	i = 0;
 	while (i < p[0].plate.num_philos)
 	{
@@ -156,15 +158,7 @@ int		main(int ac, char **av)
 		i++;
 	}
 	if (died(p))
-	{
-		if (p->die == 1)
-			printf("died\n");
-		else if (p->die == 2)
-			printf("rahoma cheb3o\n");
-		free(p);
-		return (1);
-	}
+		return (free(p), 1);
 	free(p);
-
 	return (0);
 }
