@@ -46,8 +46,10 @@ void	*add(void *data)
 		printf("%ld %d has taken a fork\n", get_real_time() - p->start_time ,p->idx);
 		printf("%ld %d is eating\n", get_real_time() - p->start_time ,p->idx);
 		pthread_mutex_unlock(&p->print);
+		pthread_mutex_lock(&p->update);
 		p->meals_eaten++;
 		p->last_meal_time = get_real_time();
+		pthread_mutex_unlock(&p->update);
 		usleep(p->plate.time_to_eat * 1000);
 		pthread_mutex_unlock(&p->left_fork);
 		pthread_mutex_unlock(p->right_fork);
@@ -64,7 +66,6 @@ void	*add(void *data)
 
 		pthread_mutex_lock(&p->print);
 		printf("%ld %d is thinking\n", get_real_time() - p->start_time ,p->idx);
-		// usleep(p->plate.time_to_eat * 1000);
 		pthread_mutex_unlock(&p->print);
 		if (get_real_time() - p->last_meal_time > p->plate.time_to_die)
 			exit(1);
