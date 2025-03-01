@@ -43,7 +43,7 @@ typedef struct s_philo
 	long	last_meal_time;
 	t_plate		plate;
 	pthread_t	thread;
-	pthread_mutex_t	print;
+	pthread_mutex_t	*print;
 	pthread_mutex_t	update;
 	pthread_mutex_t	left_fork;
 	pthread_mutex_t	*right_fork;
