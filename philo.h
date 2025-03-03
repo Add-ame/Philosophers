@@ -28,7 +28,7 @@ typedef	struct s_data
 	int		time_to_die;
 	int		time_to_eat;
 	int		time_to_sleep;
-	int		simulation_end;
+	long	simulation_end_time;
 	int		must_eat_num;
 	pthread_mutex_t	mutex;
 }	t_plate;
@@ -41,7 +41,7 @@ typedef struct s_philo
 	int		real_time;
 	int		meals_eaten;
 	long	last_meal_time;
-	t_plate		plate;
+	t_plate		*plate;
 	pthread_t	thread;
 	pthread_mutex_t	*print;
 	pthread_mutex_t	update;
