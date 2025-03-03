@@ -50,4 +50,16 @@ typedef struct s_philo
 }   t_philo;
 
 
+/*                    init_table                    */
+void    init_table(t_plate *table, int ac, char **av);
+
+/*                     died                         */
+int		died(t_philo *p);
+
+/*                     died                         */
+void    init(t_philo *p, int i, pthread_mutex_t *mutex, t_plate *pl);
+
+/*                     time                         */
+long	get_real_time();
+
 #endif
