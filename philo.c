@@ -23,6 +23,7 @@ int		simulation_end(t_philo *p, int flag)
 	{
 		if (p->meals_eaten == p->plate->must_eat_num)
 		{
+			p->plate->simulation_end_time = get_real_time() - p->last_meal_time;
 			p->die = FULL;
 			return (FULL);
 		}
@@ -41,10 +42,9 @@ void	*add(void *data)
 		printf("%ld %d is thinking\n", get_real_time() - p->start_time,p->idx);
 		usleep(1000);
 	}
-	while (1)
+
+	while (!p->plate->simulation_end_time)
 	{
-		if (p->plate->simulation_end_time)
-			return (NULL);
 		if (simulation_end(p, CHECK_STARVED) == STARVED)
 			return (NULL);
 		pthread_mutex_lock(&p->left_fork);
@@ -70,8 +70,6 @@ void	*add(void *data)
 		pthread_mutex_unlock(&p->left_fork);
 		pthread_mutex_unlock(p->right_fork);
 
-		if (p->plate->simulation_end_time)
-			return (NULL);
 		pthread_mutex_lock(p->print);
 		printf("%ld %d is sleeping\n", get_real_time() - p->start_time ,p->idx);
 		pthread_mutex_unlock(p->print);
@@ -80,6 +78,8 @@ void	*add(void *data)
 		if (simulation_end(p, CHECK_STARVED) == STARVED || simulation_end(p, CHECK_FULL) == FULL)
 			return (NULL);
 
+		if (p->plate->simulation_end_time)
+			return (NULL);
 		pthread_mutex_lock(p->print);
 		printf("%ld %d is thinking\n", get_real_time() - p->start_time ,p->idx);
 		pthread_mutex_unlock(p->print);
@@ -87,94 +87,47 @@ void	*add(void *data)
 	return NULL;
 }
 
-void	init(t_philo *p, int ac, int i, pthread_mutex_t *mutex, t_plate *pl)
-{
-	// int		i;
-
-	if (ac != 5 && ac != 6)
-		exit(22);
-
-	p->idx = i + 1;
-	p->real_time = get_real_time();
-	p->meals_eaten = 0;
-	p->print = mutex;
-	p->start_time = get_real_time();
-	p->last_meal_time = get_real_time();
-	p->die = 0;
-	p->plate = pl;
-}
-
-int		died(t_philo *p)
-{
-	int		i;
-
-	while (1)
-	{
-		i = 0;
-		while (i < p[i].plate->num_philos)
-		{
-			if (p[i].die == STARVED)
-			{
-				printf("%ld %d died\n", p[i].plate->simulation_end_time, p[i].idx);
-				return (STARVED);
-			}
-			if (p[i].die == FULL)
-			{
-				printf("Rahom cheb3o\n");
-				return (FULL);
-			}
-			i++;
-		}
-	}
-	return (0);
-}
-
 int		main(int ac, char **av)
 {
 	t_philo		*p;
 	int		i;
-	int		num;
-	t_plate		*pl;
+	t_plate		*table;
 	pthread_mutex_t mutex;
 
-	pl = malloc(sizeof(t_plate));
-	pl->num_philos = atoi(av[1]);
-	pl->time_to_die = atoi(av[2]);
-	pl->time_to_eat = atoi(av[3]);
-	pl->time_to_sleep = atoi(av[4]);
-	pl->simulation_end_time = 0;
-	if (ac == 6)
-		pl->must_eat_num = atoi(av[5]);
-	i = 0;
+	table = malloc(sizeof(t_plate));
+	init_table(table, ac, av);
 	pthread_mutex_init(&mutex, NULL);
-	num = atoi(av[1]);
-	p = malloc(sizeof(t_philo) * num);
-	while (i < num)
+	table->num_philos = atoi(av[1]);
+	p = malloc(sizeof(t_philo) * table->num_philos);
+	i = 0;
+	while (i < table->num_philos)
 	{
-		init(&p[i], ac, i, &mutex, pl);
+		init(&p[i], i, &mutex, table);
 		pthread_mutex_init(&p[i].left_fork, NULL);
-		p[i].right_fork = &p[(i + 1) % pl->num_philos].left_fork;
+		pthread_mutex_init(&p[i].update, NULL);
+		p[i].right_fork = &p[(i + 1) % table->num_philos].left_fork;
 		if (pthread_create(&p[i].thread, NULL, add, &p[i]) != 0)
 			return (perror("fail"), 1);
 		i++;
 	}
 
 	i = 0;
-	while (i < num)
+	while (i < table->num_philos)
 	{
 		if (pthread_join(p[i].thread, NULL) != 0)
 			return (perror("fail"), 1);
 		i++;
 	}
 	i = 0;
-	while (i < num)
+	while (i < table->num_philos)
 	{
 		pthread_mutex_destroy(&p[i].left_fork);
+		pthread_mutex_destroy(&p[i].update);
 		i++;
 	}
 	pthread_mutex_destroy(&mutex);
 	if (died(p))
-		return (free(p), 1);
-	free(p);
+		return (free(p), free(table), 1);
+	free(p), free(table);
 	return (0);
 }
