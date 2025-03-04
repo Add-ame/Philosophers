@@ -30,7 +30,6 @@ typedef	struct s_data
 	int		time_to_sleep;
 	long	simulation_end_time;
 	int		must_eat_num;
-	pthread_mutex_t	mutex;
 }	t_plate;
 
 typedef struct s_philo
@@ -44,7 +43,7 @@ typedef struct s_philo
 	t_plate		*plate;
 	pthread_t	thread;
 	pthread_mutex_t	*print;
-	pthread_mutex_t	update;
+	pthread_mutex_t	*upd;
 	pthread_mutex_t	left_fork;
 	pthread_mutex_t	*right_fork;
 }   t_philo;
@@ -57,7 +56,7 @@ void    init_table(t_plate *table, int ac, char **av);
 int		died(t_philo *p);
 
 /*                     died                         */
-void    init(t_philo *p, int i, pthread_mutex_t *mutex, t_plate *pl);
+void    init(t_philo *p, int i, pthread_mutex_t *mutex, t_plate *pl, pthread_mutex_t *up);
 
 /*                     time                         */
 long	get_real_time();
