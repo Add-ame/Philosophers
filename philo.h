@@ -11,6 +11,7 @@
 # define FULL 2
 # define CHECK_STARVED 1
 # define CHECK_FULL 2
+# define ERROR -1
 
 typedef enum {
 	def,
@@ -30,6 +31,8 @@ typedef	struct s_data
 	int		time_to_sleep;
 	long	simulation_end_time;
 	int		must_eat_num;
+	pthread_mutex_t mutex;
+	pthread_mutex_t mutex_upd;
 }	t_plate;
 
 typedef struct s_philo
@@ -56,9 +59,9 @@ void    init_table(t_plate *table, int ac, char **av);
 int		died(t_philo *p);
 
 /*                     died                         */
-void    init(t_philo *p, int i, pthread_mutex_t *mutex, t_plate *pl, pthread_mutex_t *up);
+void	init(t_philo *p, int i, t_plate *pl);
 
 /*                     time                         */
-long	get_real_time();
+long	get_real_time(t_philo *p, int flag);
 
 #endif
