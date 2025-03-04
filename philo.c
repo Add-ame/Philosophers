@@ -87,15 +87,19 @@ void	*add(void *data)
 			return (NULL);
 
 		pthread_mutex_lock(p->print);
+		pthread_mutex_lock(p->upd);
+		if (p->plate->simulation_end_time)
+			return (pthread_mutex_unlock(p->upd), pthread_mutex_unlock(p->print), NULL);
+		pthread_mutex_unlock(p->upd);
 		printf("%ld %d is sleeping\n", get_real_time() - p->start_time ,p->idx);
 		pthread_mutex_unlock(p->print);
 		usleep(p->plate->time_to_sleep * 1000);
 
+		pthread_mutex_lock(p->print);
 		pthread_mutex_lock(p->upd);
 		if (p->plate->simulation_end_time)
-			return (pthread_mutex_unlock(p->upd), NULL);
+			return (pthread_mutex_unlock(p->upd), pthread_mutex_unlock(p->print), NULL);
 		pthread_mutex_unlock(p->upd);
-		pthread_mutex_lock(p->print);
 		printf("%ld %d is thinking\n", get_real_time() - p->start_time ,p->idx);
 		pthread_mutex_unlock(p->print);
 	}
