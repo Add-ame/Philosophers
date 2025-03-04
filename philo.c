@@ -31,9 +31,6 @@ int		simulation_end(t_philo *p, int flag)
 	{
 		if (p->meals_eaten == p->plate->must_eat_num)
 		{
-			pthread_mutex_lock(p->upd);
-			p->plate->simulation_end_time = get_real_time(p, 2);
-			pthread_mutex_unlock(p->upd);
 			p->die = FULL;
 			return (FULL);
 		}
