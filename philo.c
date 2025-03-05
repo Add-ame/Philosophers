@@ -20,7 +20,6 @@ void	*add(void *data)
 
 	p = (t_philo *)data;
 
-	p->start_time = get_real_time(p, 0);
 	if (p->idx % 2 == 0 || p->idx == p->plate->num_philos)
 	{
 		pthread_mutex_lock(p->print);
@@ -46,6 +45,10 @@ void	*add(void *data)
 				return (NULL);
 			}
 			pthread_mutex_lock(p->print);
+			pthread_mutex_lock(p->checking);
+			if (p->plate->simulation_end_time)
+				return (pthread_mutex_unlock(&p->left_fork), pthread_mutex_unlock(p->right_fork), pthread_mutex_unlock(p->checking), pthread_mutex_unlock(p->print), NULL);
+			pthread_mutex_unlock(p->checking);
 			printf("%ld %d has taken a fork\n", get_real_time(p, 1), p->idx);
 			pthread_mutex_unlock(p->print);
 			pthread_mutex_lock(p->right_fork);
@@ -59,6 +62,10 @@ void	*add(void *data)
 				return (NULL);
 			}
 			pthread_mutex_lock(p->print);
+			pthread_mutex_lock(p->checking);
+			if (p->plate->simulation_end_time)
+				return (pthread_mutex_unlock(&p->left_fork), pthread_mutex_unlock(p->right_fork), pthread_mutex_unlock(p->checking), pthread_mutex_unlock(p->print), NULL);
+			pthread_mutex_unlock(p->checking);
 			printf("%ld %d has taken a fork\n", get_real_time(p, 1), p->idx);
 			pthread_mutex_unlock(p->print);
 			pthread_mutex_lock(&p->left_fork);
