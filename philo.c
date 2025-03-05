@@ -40,13 +40,12 @@ void	*add(void *data)
 		if (p->idx % 2)
 		{
 			pthread_mutex_lock(&p->left_fork);
-			pthread_mutex_lock(p->print);
 			if (check_philo(p, CHECK_STARVED) == STARVED)
 			{
-				pthread_mutex_unlock(p->print);
 				pthread_mutex_unlock(&p->left_fork);
 				return (NULL);
 			}
+			pthread_mutex_lock(p->print);
 			printf("%ld %d has taken a fork\n", get_real_time(p, 1), p->idx);
 			pthread_mutex_unlock(p->print);
 			pthread_mutex_lock(p->right_fork);
@@ -54,13 +53,12 @@ void	*add(void *data)
 		else
 		{
 			pthread_mutex_lock(p->right_fork);
-			pthread_mutex_lock(p->print);
 			if (check_philo(p, CHECK_STARVED) == STARVED)
 			{
-				pthread_mutex_unlock(p->print);
 				pthread_mutex_unlock(p->right_fork);
 				return (NULL);
 			}
+			pthread_mutex_lock(p->print);
 			printf("%ld %d has taken a fork\n", get_real_time(p, 1), p->idx);
 			pthread_mutex_unlock(p->print);
 			pthread_mutex_lock(&p->left_fork);
@@ -85,7 +83,9 @@ void	*add(void *data)
 		pthread_mutex_unlock(&p->left_fork);
 		pthread_mutex_unlock(p->right_fork);
 
-		if (check_philo(p, CHECK_STARVED) == STARVED || check_philo(p, CHECK_FULL) == FULL)
+		if (check_philo(p, CHECK_STARVED) == STARVED)
+			return (NULL);
+		if (check_philo(p, CHECK_FULL) == FULL)
 			return (NULL);
 
 		pthread_mutex_lock(p->print);
@@ -97,7 +97,9 @@ void	*add(void *data)
 		pthread_mutex_unlock(p->print);
 		usleep(p->plate->time_to_sleep * 1000);
 
-		if (check_philo(p, CHECK_STARVED) == STARVED || check_philo(p, CHECK_FULL) == FULL)
+		if (check_philo(p, CHECK_STARVED) == STARVED)
+			return (NULL);
+		if (check_philo(p, CHECK_FULL) == FULL)
 			return (NULL);
 
 		pthread_mutex_lock(p->print);
