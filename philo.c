@@ -65,6 +65,13 @@ void	*add(void *data)
 		{
 			pthread_mutex_lock(&p->left_fork);
 			pthread_mutex_lock(p->print);
+			if (simulation_end(p, CHECK_STARVED) == STARVED)
+			{
+				pthread_mutex_unlock(p->print);
+				pthread_mutex_unlock(&p->left_fork);
+				pthread_mutex_unlock(p->right_fork);
+				return (NULL);
+			}
 			printf("%ld %d has taken a fork\n", get_real_time(p, 1), p->idx);
 			pthread_mutex_unlock(p->print);
 			pthread_mutex_lock(p->right_fork);
@@ -73,6 +80,13 @@ void	*add(void *data)
 		{
 			pthread_mutex_lock(p->right_fork);
 			pthread_mutex_lock(p->print);
+			if (simulation_end(p, CHECK_STARVED) == STARVED)
+			{
+				pthread_mutex_unlock(p->print);
+				pthread_mutex_unlock(&p->left_fork);
+				pthread_mutex_unlock(p->right_fork);
+				return (NULL);
+			}
 			printf("%ld %d has taken a fork\n", get_real_time(p, 1), p->idx);
 			pthread_mutex_unlock(p->print);
 			pthread_mutex_lock(&p->left_fork);
@@ -174,6 +188,39 @@ int		clean(t_philo *p, t_plate *table)
 	return (0);
 }
 
+void	*one_thread(void	*data)
+{
+	t_philo		*p;
+
+	p = (t_philo *)data;
+	pthread_mutex_lock(p->print);
+	printf("%ld %d is thinking\n", get_real_time(p, 1), p->idx);
+	pthread_mutex_unlock(p->print);
+	pthread_mutex_lock(p->print);
+	printf("%ld %d has taken a fork\n", get_real_time(p, 1), p->idx);
+	pthread_mutex_unlock(p->print);
+	usleep(p->plate->time_to_die * 1000);
+	return (NULL);
+}
+
+int		one_philo(t_philo *p, t_plate *table)
+{
+	if (pthread_mutex_init(&p[0].left_fork, NULL) == ERROR)
+		return (ERROR);
+	if (pthread_mutex_init(&table->mutex, NULL) == ERROR)
+		return (ERROR);
+	init(p, 0, table);
+	if (pthread_create(&p[0].thread, NULL, one_thread, &p[0]) == ERROR)
+		return (ERROR);
+	if (pthread_join(p[0].thread, NULL) == ERROR)
+		return (ERROR);
+	pthread_mutex_destroy(&p[0].left_fork);
+	pthread_mutex_destroy(&table->mutex);
+	free(p);
+	free(table);
+	return (0);
+}
+
 int		main(int ac, char **av)
 {
 	t_philo		*p;
@@ -186,6 +233,8 @@ int		main(int ac, char **av)
 	p = malloc(sizeof(t_philo) * table->num_philos);
 	if (p == NULL)
 		return (free(table), ERROR);
+	if (table->num_philos == 1 && one_philo(p, table) == 0)
+		return (0);
 	if (init_mutexes(p, table) == ERROR)
 		return (ERROR);
 	if (create_threads(p, table) == ERROR)
