@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   one_philo.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/06 15:52:40 by maddame           #+#    #+#             */
+/*   Updated: 2025/03/06 16:09:18 by maddame          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 void	*one_thread(void	*data)
@@ -5,30 +17,20 @@ void	*one_thread(void	*data)
 	t_philo		*p;
 
 	p = (t_philo *)data;
-	pthread_mutex_lock(p->print);
-	printf("%ld %d is thinking\n", get_real_time(p, 1), p->idx);
-	pthread_mutex_unlock(p->print);
-	pthread_mutex_lock(p->print);
-	printf("%ld %d has taken a fork\n", get_real_time(p, 1), p->idx);
-	pthread_mutex_unlock(p->print);
-	usleep(p->plate->time_to_die * 1000);
+	printf("%d %d is thinking\n", 0, 1);
+	printf("%d %d has taken a fork\n", 0, 1);
+	usleep(p->table->time_to_die * 1000);
 	return (NULL);
 }
 
-int		one_philo(t_philo *p, t_plate *table)
+int	one_philo(t_table *table)
 {
-	if (pthread_mutex_init(&p[0].left_fork, NULL) == ERROR)
+	pthread_t	thread;
+
+	if (pthread_create(&thread, NULL, one_thread, &table) == ERROR)
 		return (ERROR);
-	if (pthread_mutex_init(&table->mutex, NULL) == ERROR)
+	if (pthread_join(thread, NULL) == ERROR)
 		return (ERROR);
-	init(p, 0, table);
-	if (pthread_create(&p[0].thread, NULL, one_thread, &p[0]) == ERROR)
-		return (ERROR);
-	if (pthread_join(p[0].thread, NULL) == ERROR)
-		return (ERROR);
-	pthread_mutex_destroy(&p[0].left_fork);
-	pthread_mutex_destroy(&table->mutex);
-	free(p);
 	free(table);
 	return (0);
 }
