@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:40 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/06 16:09:18 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/07 10:37:33 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,14 @@
 void	*one_thread(void	*data)
 {
 	t_philo		*p;
+	long		start;
 
 	p = (t_philo *)data;
+	start = get_time(p, current_time);
 	printf("%d %d is thinking\n", 0, 1);
 	printf("%d %d has taken a fork\n", 0, 1);
 	usleep(p->table->time_to_die * 1000);
+	printf("%ld %d died\n", get_time(p, current_time) - start, 1);
 	return (NULL);
 }
 
