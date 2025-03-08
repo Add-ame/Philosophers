@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:59 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/06 16:06:41 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/08 17:39:15 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ typedef struct s_philo
 	int			meals_eaten;
 	long		last_meal_time;
 	t_table		*table;
-	pthread_t	thread;
+	pthread_t	thread_id;
 	t_mutex		*print;
 	t_mutex		*checking;
 	t_mutex		left_fork;
