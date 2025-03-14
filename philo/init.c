@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:36 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/14 02:51:35 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/14 03:07:38 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,6 @@ int	init_table(t_table *table, int ac, char **av)
 	}
 	table->simulation_end_time = 0;
 	table->died = 0;
-	table->all_eaten = 1;
 	table->num_philos = ft_atoi(av[1]);
 	table->time_to_die = ft_atoi(av[2]);
 	table->time_to_eat = ft_atoi(av[3]);

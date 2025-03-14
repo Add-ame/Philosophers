@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:53 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/14 02:52:22 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/14 03:10:34 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	ft_print(t_philo *p, char *s, int flag)
 		pthread_mutex_unlock(p->checking);
 		pthread_mutex_unlock(p->print);
 		unlock_fork(p, flag);
-		return (END);
+		return (SIMULATION_END);
 	}
 	pthread_mutex_unlock(p->checking);
 	printf("%ld %d %s\n", get_time(p, DIFF_START_TO_NEW), p->idx, s);
