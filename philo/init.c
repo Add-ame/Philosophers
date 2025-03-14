@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:36 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/06 16:21:56 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/14 02:51:35 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,8 @@ void	init(t_philo *p, int i, t_table *pl)
 {
 	p->idx = i + 1;
 	p->meals_eaten = 0;
-	p->start_time = get_time(p, current_time);
-	p->last_meal_time = get_time(p, current_time);
+	p->start_time = get_time(p, CURRENT_TIME);
+	p->last_meal_time = get_time(p, CURRENT_TIME);
 	p->table = pl;
 	p->print = &pl->mutex;
 	p->checking = &pl->checking;

@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:27 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/08 17:39:15 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/14 02:52:56 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int	create_threads(t_philo *p, t_table *table)
 	{
 		init(&p[i], i, table);
 		p[i].right_fork = &p[(i + 1) % table->num_philos].left_fork;
-		if (pthread_create(&p[i].thread_id, NULL, add, &p[i]) != SUCESS)
+		if (pthread_create(&p[i].thread_id, NULL, philo_thread, &p[i]) != SUCESS)
 			return (ERROR);
 		i++;
 	}

@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:59 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/08 17:39:15 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/14 02:52:56 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,14 +33,14 @@ typedef pthread_mutex_t	t_mutex;
 
 typedef enum s_enum
 {
-	even_number,
-	left_then_right,
-	right_then_left,
-	current_time,
-	diff_start_to_new,
-	diff_last_to_new,
-	first_fork,
-	both_forks
+	EVEN_NUMBER,
+	LEFT_THEN_RIGHT,
+	RIGHT_THEN_LEFT,
+	CURRENT_TIME,
+	DIFF_START_TO_NEW,
+	DIFF_LAST_TO_NEW,
+	FIRST_FORK,
+	BOTH_FORKS
 }	t_enum;
 
 typedef struct s_table
@@ -72,7 +72,7 @@ typedef struct s_philo
 	t_mutex		*right_fork;
 }	t_philo;
 
-void	*add(void *data);
+void	*philo_thread(void *data);
 
 /*                    init                    */
 int		init_table(t_table *table, int ac, char **av);

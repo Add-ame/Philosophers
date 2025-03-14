@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_philo.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maddame <maddame@student.1337.ma>          +#+  +:+       +#+        */
+/*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:21 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/06 15:52:23 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/14 02:52:06 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,13 @@ int	check_philo(t_philo *p, int flag)
 {
 	if (flag == CHECK_STARVED)
 	{
-		if (get_time(p, diff_last_to_new) >= p->table->time_to_die)
+		if (get_time(p, DIFF_LAST_TO_NEW) >= p->table->time_to_die)
 		{
 			pthread_mutex_lock(p->print);
 			p->table->died++;
 			pthread_mutex_unlock(p->print);
 			pthread_mutex_lock(p->checking);
-			p->table->simulation_end_time = get_time(p, diff_start_to_new);
+			p->table->simulation_end_time = get_time(p, DIFF_START_TO_NEW);
 			pthread_mutex_unlock(p->checking);
 			pthread_mutex_lock(p->print);
 			if (p->table->died == 1)

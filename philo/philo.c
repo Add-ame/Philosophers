@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:48 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/06 22:23:21 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/14 02:52:56 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,23 +27,23 @@ int	_printf(t_philo *p, char *s)
 		return (END);
 	}
 	pthread_mutex_unlock(p->checking);
-	printf("%ld %d %s\n", get_time(p, diff_start_to_new), p->idx, s);
+	printf("%ld %d %s\n", get_time(p, DIFF_START_TO_NEW), p->idx, s);
 	pthread_mutex_unlock(p->print);
 	return (0);
 }
 
 void	lock_fork(t_philo *p, int flag)
 {
-	if (flag == left_then_right)
+	if (flag == LEFT_THEN_RIGHT)
 	{
-		if (p->idx % 2 == even_number)
+		if (p->idx % 2 == EVEN_NUMBER)
 			pthread_mutex_lock(p->right_fork);
 		else
 			pthread_mutex_lock(&p->left_fork);
 	}
-	else if (flag == right_then_left)
+	else if (flag == RIGHT_THEN_LEFT)
 	{
-		if (p->idx % 2 == even_number)
+		if (p->idx % 2 == EVEN_NUMBER)
 			pthread_mutex_lock(&p->left_fork);
 		else
 			pthread_mutex_lock(p->right_fork);
@@ -55,21 +55,21 @@ int	eating(t_philo *p)
 {
 	if (check_philo(p, CHECK_STARVED) == STARVED)
 		return (END);
-	lock_fork(p, left_then_right);
+	lock_fork(p, LEFT_THEN_RIGHT);
 	if (check_philo(p, CHECK_STARVED) == STARVED)
 	{
-		unlock_fork(p, first_fork);
+		unlock_fork(p, FIRST_FORK);
 		return (END);
 	}
-	if (ft_print(p, "has taken a fork", first_fork) == END)
+	if (ft_print(p, "has taken a fork", FIRST_FORK) == END)
 		return (END);
-	lock_fork(p, right_then_left);
-	if (ft_print(p, "has taken a fork", both_forks) == END)
+	lock_fork(p, RIGHT_THEN_LEFT);
+	if (ft_print(p, "has taken a fork", BOTH_FORKS) == END)
 		return (END);
-	if (ft_print(p, "is eating", both_forks) == END)
+	if (ft_print(p, "is eating", BOTH_FORKS) == END)
 		return (END);
 	p->meals_eaten++;
-	p->last_meal_time = get_time(p, current_time);
+	p->last_meal_time = get_time(p, CURRENT_TIME);
 	usleep(p->table->time_to_eat * 1000);
 	pthread_mutex_unlock(&p->left_fork);
 	pthread_mutex_unlock(p->right_fork);
@@ -80,15 +80,15 @@ int	eating(t_philo *p)
 	return (0);
 }
 
-void	*add(void *data)
+void	*philo_thread(void *data)
 {
 	t_philo	*p;
 
 	p = (t_philo *)data;
-	if (p->idx % 2 == even_number || p->idx == p->table->num_philos)
+	if (p->idx % 2 == EVEN_NUMBER || p->idx == p->table->num_philos)
 	{
 		pthread_mutex_lock(p->print);
-		printf("%ld %d is thinking\n", get_time(p, diff_start_to_new), p->idx);
+		printf("%ld %d is thinking\n", get_time(p, DIFF_START_TO_NEW), p->idx);
 		pthread_mutex_unlock(p->print);
 		usleep(1000);
 	}
