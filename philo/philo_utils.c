@@ -30,8 +30,6 @@ int	ft_print(t_philo *p, char *s, int flag)
 {
 	if (check_philo(p, CHECK_STARVED) == STARVED)
 	{
-		pthread_mutex_unlock(p->checking);
-		pthread_mutex_unlock(p->print);
 		unlock_fork(p, flag);
 		return (SIMULATION_END);
 	}
@@ -49,8 +47,6 @@ int	ft_print(t_philo *p, char *s, int flag)
 	pthread_mutex_unlock(p->print);
 	if (check_philo(p, CHECK_STARVED) == STARVED)
 	{
-		pthread_mutex_unlock(p->checking);
-		pthread_mutex_unlock(p->print);
 		unlock_fork(p, flag);
 		return (SIMULATION_END);
 	}

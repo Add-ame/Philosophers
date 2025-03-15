@@ -14,7 +14,7 @@
 
 int	_printf(t_philo *p, char *s)
 {
-	if (check_philo(p, CHECK_STARVED) == STARVED || p->table->simulation_end_time)
+	if (check_philo(p, CHECK_STARVED) == STARVED)
 		return (SIMULATION_END);
 	if (check_philo(p, CHECK_FULL) == FULL)
 		return (SIMULATION_END);
