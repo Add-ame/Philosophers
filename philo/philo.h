@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:59 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/16 00:07:20 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/16 17:45:40 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,9 @@ typedef struct s_table
 	long		num_to_eat;
 	int			num_philos;
 	int			died;
-	int			should_die;
-	int			idx;
 	t_mutex		mutex;
 	t_mutex		checking;
+	t_mutex		last_meal;
 }	t_table;
 
 typedef struct s_philo
@@ -67,6 +66,7 @@ typedef struct s_philo
 	t_table		*table;
 	t_mutex		*print;
 	t_mutex		*checking;
+	t_mutex		*last_meal;
 	t_mutex		left_fork;
 	t_mutex		*right_fork;
 	pthread_t	thread_id;
@@ -83,7 +83,7 @@ int		init_mutexes(t_philo *p, t_table *table);
 int		clean(t_philo *p, t_table *table);
 
 /*                     check_philo                         */
-int		check_philo(t_philo *p, int flag);
+void	*monitor(void *data);
 
 /*                     check_philo                         */
 void	*one_thread(void	*data);

@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:36 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/16 01:04:13 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/16 17:46:13 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ void	init(t_philo *p, int i, t_table *pl)
 	p->table = pl;
 	p->print = &pl->mutex;
 	p->checking = &pl->checking;
+	p->last_meal = &pl->last_meal;
 }
 
 int	init_table(t_table *table, int ac, char **av)
@@ -81,8 +82,6 @@ int	init_table(t_table *table, int ac, char **av)
 	}
 	table->simulation_end_time = 0;
 	table->died = 0;
-	table->idx = 0;
-	table->should_die = 0;
 	table->num_philos = ft_atoi(av[1]);
 	table->time_to_die = ft_atoi(av[2]);
 	table->time_to_eat = ft_atoi(av[3]);
@@ -98,14 +97,6 @@ int	init_table(t_table *table, int ac, char **av)
 		free(table);
 		return (INV_ARG);
 	}
-	if (table->num_philos % 2 == EVEN_NUMBER)
-	{
-		if (table->time_to_eat * 2 >= table->time_to_die)
-			table->should_die = 1;
-	}
-	else
-		if (table->time_to_eat * 3 >= table->time_to_die)
-			table->should_die = 1;
 	return (0);
 }
 
@@ -117,6 +108,8 @@ int	init_mutexes(t_philo *p, t_table *table)
 	if (pthread_mutex_init(&table->mutex, NULL) == ERROR)
 		return (ERROR);
 	if (pthread_mutex_init(&table->checking, NULL) == ERROR)
+		return (ERROR);
+	if (pthread_mutex_init(&table->last_meal, NULL) == ERROR)
 		return (ERROR);
 	while (i < table->num_philos)
 	{

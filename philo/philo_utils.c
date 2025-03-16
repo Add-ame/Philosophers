@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:53 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/16 01:08:11 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/16 17:46:03 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,30 +22,16 @@ long	get_time(t_philo *p, int flag)
 	if (flag == DIFF_START_TO_NEW)
 		result = result - p->start_time;
 	else if (flag == DIFF_LAST_TO_NEW)
-		result = result - p->last_meal_time;
-	if ((flag == DIFF_LAST_TO_NEW || flag == DIFF_START_TO_NEW) && p->table->should_die)
 	{
-		if (result >= p->table->time_to_die)
-		{
-			pthread_mutex_lock(p->checking);
-			p->table->died++;
-			p->table->simulation_end_time = result;
-			pthread_mutex_unlock(p->checking);
-			pthread_mutex_lock(p->checking);
-			if (p->table->died == 1)
-				printf("%ld %d died\n", p->table->time_to_die, p->idx);
-			pthread_mutex_unlock(p->checking);
-			return (0);
-		}
+		pthread_mutex_lock(p->last_meal);
+		result = result - p->last_meal_time;
+		pthread_mutex_unlock(p->last_meal);
 	}
 	return (result);
 }
 
 int	ft_print(t_philo *p, char *s, int flag)
 {
-	long	save;
-
-	save = 1;
 	pthread_mutex_lock(p->print);
 	pthread_mutex_lock(p->checking);
 	if (p->table->simulation_end_time)
@@ -56,10 +42,7 @@ int	ft_print(t_philo *p, char *s, int flag)
 		return (SIMULATION_END);
 	}
 	pthread_mutex_unlock(p->checking);
-	save = get_time(p, DIFF_START_TO_NEW);
-	if (!save && (p->idx % 2 == EVEN_NUMBER || p->meals_eaten >= 1))
-		return (pthread_mutex_unlock(p->print), unlock_fork(p, flag), SIMULATION_END);
-	printf("%ld %d %s\n", save, p->idx, s);
+	printf("%ld %d %s\n", get_time(p, DIFF_START_TO_NEW), p->idx, s);
 	pthread_mutex_unlock(p->print);
 	return (0);
 }

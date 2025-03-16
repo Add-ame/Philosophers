@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:48 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/16 01:09:54 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/16 17:45:19 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,6 @@
 
 int	_printf(t_philo *p, char *s)
 {
-	long	save;
-
-	if (check_philo(p, CHECK_FULL) == FULL)
-		return (SIMULATION_END);
 	pthread_mutex_lock(p->print);
 	pthread_mutex_lock(p->checking);
 	if (p->table->simulation_end_time)
@@ -27,10 +23,7 @@ int	_printf(t_philo *p, char *s)
 		return (SIMULATION_END);
 	}
 	pthread_mutex_unlock(p->checking);
-	save = get_time(p, DIFF_START_TO_NEW);
-	if (!save)
-		return (pthread_mutex_unlock(p->print), SIMULATION_END);
-	printf("%ld %d %s\n", save, p->idx, s);
+	printf("%ld %d %s\n", get_time(p, DIFF_START_TO_NEW), p->idx, s);
 	pthread_mutex_unlock(p->print);
 	return (0);
 }
@@ -65,14 +58,12 @@ int	eating(t_philo *p)
 	if (ft_print(p, "is eating", BOTH_FORKS) == SIMULATION_END)
 		return (SIMULATION_END);
 	p->meals_eaten++;
+	pthread_mutex_lock(p->last_meal);
 	p->last_meal_time = get_time(p, CURRENT_TIME);
+	pthread_mutex_unlock(p->last_meal);
 	usleep(p->table->time_to_eat * 1000);
 	pthread_mutex_unlock(&p->left_fork);
 	pthread_mutex_unlock(p->right_fork);
-	pthread_mutex_lock(p->checking);
-	if (p->table->simulation_end_time)
-		return (pthread_mutex_unlock(p->checking), SIMULATION_END);
-	pthread_mutex_unlock(p->checking);
 	return (0);
 }
 
@@ -97,6 +88,8 @@ void	*philo_thread(void *data)
 		usleep(p->table->time_to_sleep * 1000);
 		if (_printf(p, "is thinking") == SIMULATION_END)
 			break ;
+		if (p->idx % 2)
+			usleep(p->table->time_to_eat * 1000);
 	}
 	return (NULL);
 }

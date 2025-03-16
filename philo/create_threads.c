@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:27 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/14 03:14:08 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/16 17:46:38 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 
 int	create_threads(t_philo *p, t_table *table)
 {
-	int		i;
+	pthread_t	id;
+	int			i;
 
 	i = 0;
 	while (i < table->num_philos)
@@ -26,6 +27,8 @@ int	create_threads(t_philo *p, t_table *table)
 			return (ERROR);
 		i++;
 	}
+	pthread_create(&id, NULL, monitor, p);
+	pthread_join(id, NULL);
 	i = 0;
 	while (i < table->num_philos)
 	{

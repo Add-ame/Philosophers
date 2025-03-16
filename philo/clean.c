@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   clean.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maddame <maddame@student.1337.ma>          +#+  +:+       +#+        */
+/*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:32 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/06 15:52:33 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/16 17:46:50 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ int	clean(t_philo *p, t_table *table)
 	if (pthread_mutex_destroy(&table->mutex) == ERROR)
 		return (ERROR);
 	if (pthread_mutex_destroy(&table->checking) == ERROR)
+		return (ERROR);
+	if (pthread_mutex_destroy(&table->last_meal) == ERROR)
 		return (ERROR);
 	free(p);
 	free(table);

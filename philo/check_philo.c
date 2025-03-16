@@ -6,20 +6,37 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:21 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/16 01:09:12 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/16 17:46:42 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	check_philo(t_philo *p, int flag)
+void	*monitor(void *data)
 {
-	if (flag == CHECK_FULL)
+	t_philo		*p;
+	int			i;
+
+	p = (t_philo *)data;
+	while (1)
 	{
-		if (p->meals_eaten == p->table->num_to_eat)
+		i = 0;
+		while (i < p[0].table->num_philos)
 		{
-			return (FULL);
+			if (get_time(&p[i], DIFF_LAST_TO_NEW) > p[i].table->time_to_die)
+			{
+				pthread_mutex_lock(p[i].checking);
+				p[i].table->simulation_end_time = \
+				get_time(&p[i], DIFF_START_TO_NEW);
+				pthread_mutex_unlock(p[i].checking);
+				pthread_mutex_lock(p[i].print);
+				printf("%ld %d died\n", p[i].table->simulation_end_time, \
+				p[i].idx);
+				pthread_mutex_unlock(p[i].print);
+				return (NULL);
+			}
+			i++;
 		}
 	}
-	return (0);
+	return (NULL);
 }
