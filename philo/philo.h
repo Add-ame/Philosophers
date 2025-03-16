@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:59 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/14 03:11:20 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/16 00:07:20 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ typedef struct s_table
 	long		num_to_eat;
 	int			num_philos;
 	int			died;
+	int			should_die;
 	t_mutex		mutex;
 	t_mutex		checking;
 }	t_table;

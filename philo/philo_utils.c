@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:53 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/14 03:10:34 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/16 01:08:11 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,16 +23,26 @@ long	get_time(t_philo *p, int flag)
 		result = result - p->start_time;
 	else if (flag == DIFF_LAST_TO_NEW)
 		result = result - p->last_meal_time;
+	if ((flag == DIFF_LAST_TO_NEW || flag == DIFF_START_TO_NEW) && p->table->should_die)
+	{
+		if (result >= p->table->time_to_die)
+		{
+			pthread_mutex_lock(p->checking);
+			p->table->died++;
+			p->table->simulation_end_time = result;
+			pthread_mutex_unlock(p->checking);
+			pthread_mutex_lock(p->checking);
+			if (p->table->died == 1)
+				printf("%ld %d died\n", p->table->time_to_die, p->idx);
+			pthread_mutex_unlock(p->checking);
+			return (0);
+		}
+	}
 	return (result);
 }
 
 int	ft_print(t_philo *p, char *s, int flag)
 {
-	if (check_philo(p, CHECK_STARVED) == STARVED)
-	{
-		unlock_fork(p, flag);
-		return (SIMULATION_END);
-	}
 	pthread_mutex_lock(p->print);
 	pthread_mutex_lock(p->checking);
 	if (p->table->simulation_end_time)
@@ -45,11 +55,6 @@ int	ft_print(t_philo *p, char *s, int flag)
 	pthread_mutex_unlock(p->checking);
 	printf("%ld %d %s\n", get_time(p, DIFF_START_TO_NEW), p->idx, s);
 	pthread_mutex_unlock(p->print);
-	if (check_philo(p, CHECK_STARVED) == STARVED)
-	{
-		unlock_fork(p, flag);
-		return (SIMULATION_END);
-	}
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:48 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/14 03:10:34 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/16 01:09:54 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 int	_printf(t_philo *p, char *s)
 {
+	long	save;
+
 	if (check_philo(p, CHECK_STARVED) == STARVED)
 		return (SIMULATION_END);
 	if (check_philo(p, CHECK_FULL) == FULL)
@@ -27,7 +29,10 @@ int	_printf(t_philo *p, char *s)
 		return (SIMULATION_END);
 	}
 	pthread_mutex_unlock(p->checking);
-	printf("%ld %d %s\n", get_time(p, DIFF_START_TO_NEW), p->idx, s);
+	save = get_time(p, DIFF_START_TO_NEW);
+	if (!save)
+		return (pthread_mutex_unlock(p->print), SIMULATION_END);
+	printf("%ld %d %s\n", save, p->idx, s);
 	pthread_mutex_unlock(p->print);
 	return (0);
 }
@@ -53,14 +58,7 @@ void	lock_fork(t_philo *p, int flag)
 
 int	eating(t_philo *p)
 {
-	if (check_philo(p, CHECK_STARVED) == STARVED)
-		return (SIMULATION_END);
 	lock_fork(p, LEFT_THEN_RIGHT);
-	if (check_philo(p, CHECK_STARVED) == STARVED)
-	{
-		unlock_fork(p, FIRST_FORK);
-		return (SIMULATION_END);
-	}
 	if (ft_print(p, "has taken a fork", FIRST_FORK) == SIMULATION_END)
 		return (SIMULATION_END);
 	lock_fork(p, RIGHT_THEN_LEFT);
