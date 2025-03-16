@@ -43,6 +43,9 @@ long	get_time(t_philo *p, int flag)
 
 int	ft_print(t_philo *p, char *s, int flag)
 {
+	long	save;
+
+	save = 1;
 	pthread_mutex_lock(p->print);
 	pthread_mutex_lock(p->checking);
 	if (p->table->simulation_end_time)
@@ -53,7 +56,10 @@ int	ft_print(t_philo *p, char *s, int flag)
 		return (SIMULATION_END);
 	}
 	pthread_mutex_unlock(p->checking);
-	printf("%ld %d %s\n", get_time(p, DIFF_START_TO_NEW), p->idx, s);
+	save = get_time(p, DIFF_START_TO_NEW);
+	if (!save)
+		return (pthread_mutex_unlock(p->print), unlock_fork(p, flag), SIMULATION_END);
+	printf("%ld %d %s\n", save, p->idx, s);
 	pthread_mutex_unlock(p->print);
 	return (0);
 }
