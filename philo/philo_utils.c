@@ -57,7 +57,7 @@ int	ft_print(t_philo *p, char *s, int flag)
 	}
 	pthread_mutex_unlock(p->checking);
 	save = get_time(p, DIFF_START_TO_NEW);
-	if (!save)
+	if (!save && p->idx % 2 == EVEN_NUMBER)
 		return (pthread_mutex_unlock(p->print), unlock_fork(p, flag), SIMULATION_END);
 	printf("%ld %d %s\n", save, p->idx, s);
 	pthread_mutex_unlock(p->print);

@@ -16,8 +16,6 @@ int	_printf(t_philo *p, char *s)
 {
 	long	save;
 
-	if (check_philo(p, CHECK_STARVED) == STARVED)
-		return (SIMULATION_END);
 	if (check_philo(p, CHECK_FULL) == FULL)
 		return (SIMULATION_END);
 	pthread_mutex_lock(p->print);

@@ -53,6 +53,7 @@ typedef struct s_table
 	int			num_philos;
 	int			died;
 	int			should_die;
+	int			idx;
 	t_mutex		mutex;
 	t_mutex		checking;
 }	t_table;

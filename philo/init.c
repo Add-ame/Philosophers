@@ -81,6 +81,7 @@ int	init_table(t_table *table, int ac, char **av)
 	}
 	table->simulation_end_time = 0;
 	table->died = 0;
+	table->idx = 0;
 	table->should_die = 0;
 	table->num_philos = ft_atoi(av[1]);
 	table->time_to_die = ft_atoi(av[2]);
