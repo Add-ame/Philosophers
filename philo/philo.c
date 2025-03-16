@@ -6,7 +6,7 @@
 /*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:52:48 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/16 17:45:19 by maddame          ###   ########.fr       */
+/*   Updated: 2025/03/16 23:20:03 by maddame          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,24 +72,17 @@ void	*philo_thread(void *data)
 	t_philo	*p;
 
 	p = (t_philo *)data;
-	if (p->idx % 2 == EVEN_NUMBER || p->idx == p->table->num_philos)
-	{
-		pthread_mutex_lock(p->print);
-		printf("%ld %d is thinking\n", get_time(p, DIFF_START_TO_NEW), p->idx);
-		pthread_mutex_unlock(p->print);
-		usleep(1000);
-	}
 	while (1)
 	{
+		if (_printf(p, "is thinking") == SIMULATION_END)
+			break ;
+		if (p->table->num_philos % 2 && p->idx % 2)
+			usleep(p->table->time_to_eat * 1000);
 		if (eating(p) == SIMULATION_END)
 			break ;
 		if (_printf(p, "is sleeping") == SIMULATION_END)
 			break ;
 		usleep(p->table->time_to_sleep * 1000);
-		if (_printf(p, "is thinking") == SIMULATION_END)
-			break ;
-		if (p->idx % 2)
-			usleep(p->table->time_to_eat * 1000);
 	}
 	return (NULL);
 }
