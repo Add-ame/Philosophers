@@ -12,6 +12,49 @@
 
 #include "philo.h"
 
+int	ft_print(t_philo *p, char *s, int flag)
+{
+	pthread_mutex_lock(p->print);
+	pthread_mutex_lock(p->checking);
+	if (p->table->simulation_end_time)
+	{
+		pthread_mutex_unlock(p->checking);
+		pthread_mutex_unlock(p->print);
+		if (flag == BOTH_FORKS)
+		{
+			pthread_mutex_unlock(p->right_fork);
+			pthread_mutex_unlock(&p->left_fork);
+		}
+		else if (flag == FIRST_FORK)
+			pthread_mutex_unlock(&p->left_fork);
+		return (SIMULATION_END);
+	}
+	pthread_mutex_unlock(p->checking);
+	printf("%ld %d %s\n", get_time(p, DIFF_START_TO_NEW), p->idx, s);
+	pthread_mutex_unlock(p->print);
+	return (0);
+}
+
+int	eating(t_philo *p)
+{
+	pthread_mutex_lock(&p->left_fork);
+	if (ft_print(p, "has taken a fork", FIRST_FORK) == SIMULATION_END)
+		return (SIMULATION_END);
+	pthread_mutex_lock(p->right_fork);
+	if (ft_print(p, "has taken a fork", BOTH_FORKS) == SIMULATION_END)
+		return (SIMULATION_END);
+	if (ft_print(p, "is eating", BOTH_FORKS) == SIMULATION_END)
+		return (SIMULATION_END);
+	pthread_mutex_lock(p->last_meal);
+	p->meals_eaten++;
+	p->last_meal_time = get_time(p, CURRENT_TIME);
+	pthread_mutex_unlock(p->last_meal);
+	usleep(p->table->time_to_eat * 1000);
+	pthread_mutex_unlock(&p->left_fork);
+	pthread_mutex_unlock(p->right_fork);
+	return (0);
+}
+
 int	_printf(t_philo *p, char *s)
 {
 	pthread_mutex_lock(p->print);
@@ -28,56 +71,19 @@ int	_printf(t_philo *p, char *s)
 	return (0);
 }
 
-void	lock_fork(t_philo *p, int flag)
-{
-	if (flag == LEFT_THEN_RIGHT)
-	{
-		if (p->idx % 2 == EVEN_NUMBER)
-			pthread_mutex_lock(p->right_fork);
-		else
-			pthread_mutex_lock(&p->left_fork);
-	}
-	else if (flag == RIGHT_THEN_LEFT)
-	{
-		if (p->idx % 2 == EVEN_NUMBER)
-			pthread_mutex_lock(&p->left_fork);
-		else
-			pthread_mutex_lock(p->right_fork);
-	}
-	return ;
-}
-
-int	eating(t_philo *p)
-{
-	lock_fork(p, LEFT_THEN_RIGHT);
-	if (ft_print(p, "has taken a fork", FIRST_FORK) == SIMULATION_END)
-		return (SIMULATION_END);
-	lock_fork(p, RIGHT_THEN_LEFT);
-	if (ft_print(p, "has taken a fork", BOTH_FORKS) == SIMULATION_END)
-		return (SIMULATION_END);
-	if (ft_print(p, "is eating", BOTH_FORKS) == SIMULATION_END)
-		return (SIMULATION_END);
-	p->meals_eaten++;
-	pthread_mutex_lock(p->last_meal);
-	p->last_meal_time = get_time(p, CURRENT_TIME);
-	pthread_mutex_unlock(p->last_meal);
-	usleep(p->table->time_to_eat * 1000);
-	pthread_mutex_unlock(&p->left_fork);
-	pthread_mutex_unlock(p->right_fork);
-	return (0);
-}
-
 void	*philo_thread(void *data)
 {
 	t_philo	*p;
 
 	p = (t_philo *)data;
+	if (p->idx % 2 == EVEN_NUMBER || p->idx == p->table->num_philos)
+		usleep(1000);
 	while (1)
 	{
 		if (_printf(p, "is thinking") == SIMULATION_END)
 			break ;
 		if (p->table->num_philos % 2 && p->idx % 2)
-			usleep(p->table->time_to_eat * 1000);
+			usleep(1000);
 		if (eating(p) == SIMULATION_END)
 			break ;
 		if (_printf(p, "is sleeping") == SIMULATION_END)

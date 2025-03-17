@@ -29,37 +29,3 @@ long	get_time(t_philo *p, int flag)
 	}
 	return (result);
 }
-
-int	ft_print(t_philo *p, char *s, int flag)
-{
-	pthread_mutex_lock(p->print);
-	pthread_mutex_lock(p->checking);
-	if (p->table->simulation_end_time)
-	{
-		pthread_mutex_unlock(p->checking);
-		pthread_mutex_unlock(p->print);
-		unlock_fork(p, flag);
-		return (SIMULATION_END);
-	}
-	pthread_mutex_unlock(p->checking);
-	printf("%ld %d %s\n", get_time(p, DIFF_START_TO_NEW), p->idx, s);
-	pthread_mutex_unlock(p->print);
-	return (0);
-}
-
-void	unlock_fork(t_philo *p, int flag)
-{
-	if (flag == FIRST_FORK)
-	{
-		if (p->idx % 2 == EVEN_NUMBER)
-			pthread_mutex_unlock(p->right_fork);
-		else
-			pthread_mutex_unlock(&p->left_fork);
-	}
-	else if (flag == BOTH_FORKS)
-	{
-		pthread_mutex_unlock(&p->left_fork);
-		pthread_mutex_unlock(p->right_fork);
-	}
-	return ;
-}

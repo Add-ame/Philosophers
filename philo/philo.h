@@ -94,8 +94,5 @@ int		create_threads(t_philo *p, t_table *table);
 
 /*                    philo_utils                  */
 long	get_time(t_philo *p, int flag);
-int		ft_print(t_philo *p, char *s, int flag);
-void	lock_fork(t_philo *p, int flag);
-void	unlock_fork(t_philo *p, int flag);
 
 #endif
