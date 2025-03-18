@@ -51,10 +51,11 @@ typedef struct s_table
 	long		simulation_end_time;
 	long		num_to_eat;
 	int			num_philos;
-	int			died;
+	int			all_eaten;
 	t_mutex		mutex;
 	t_mutex		checking;
 	t_mutex		last_meal;
+	t_mutex		all_eat;
 }	t_table;
 
 typedef struct s_philo
@@ -66,6 +67,7 @@ typedef struct s_philo
 	t_table		*table;
 	t_mutex		*print;
 	t_mutex		*checking;
+	t_mutex		*all_eat;
 	t_mutex		*last_meal;
 	t_mutex		left_fork;
 	t_mutex		*right_fork;

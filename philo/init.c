@@ -70,6 +70,7 @@ void	init(t_philo *p, int i, t_table *pl)
 	p->print = &pl->mutex;
 	p->checking = &pl->checking;
 	p->last_meal = &pl->last_meal;
+	p->all_eat = &pl->all_eat;
 }
 
 int	init_table(t_table *table, int ac, char **av)
@@ -81,7 +82,7 @@ int	init_table(t_table *table, int ac, char **av)
 		return (INV_ARG);
 	}
 	table->simulation_end_time = 0;
-	table->died = 0;
+	table->all_eaten = 1;
 	table->num_philos = ft_atoi(av[1]);
 	table->time_to_die = ft_atoi(av[2]);
 	table->time_to_eat = ft_atoi(av[3]);
@@ -110,6 +111,8 @@ int	init_mutexes(t_philo *p, t_table *table)
 	if (pthread_mutex_init(&table->checking, NULL) == ERROR)
 		return (ERROR);
 	if (pthread_mutex_init(&table->last_meal, NULL) == ERROR)
+		return (ERROR);
+	if (pthread_mutex_init(&table->all_eat, NULL) == ERROR)
 		return (ERROR);
 	while (i < table->num_philos)
 	{

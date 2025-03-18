@@ -49,6 +49,15 @@ int	eating(t_philo *p)
 	p->meals_eaten++;
 	p->last_meal_time = get_time(p, CURRENT_TIME);
 	pthread_mutex_unlock(p->last_meal);
+	if (p->meals_eaten == p->table->num_to_eat)
+	{
+		pthread_mutex_lock(p->all_eat);
+		p->table->all_eaten++;
+		pthread_mutex_unlock(p->all_eat);
+		pthread_mutex_unlock(&p->left_fork);
+		pthread_mutex_unlock(p->right_fork);
+		return (SIMULATION_END);
+	}
 	usleep(p->table->time_to_eat * 1000);
 	pthread_mutex_unlock(&p->left_fork);
 	pthread_mutex_unlock(p->right_fork);
@@ -82,8 +91,6 @@ void	*philo_thread(void *data)
 	{
 		if (_printf(p, "is thinking") == SIMULATION_END)
 			break ;
-		if (p->table->num_philos % 2 && p->idx % 2)
-			usleep(1000);
 		if (eating(p) == SIMULATION_END)
 			break ;
 		if (_printf(p, "is sleeping") == SIMULATION_END)
