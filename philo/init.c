@@ -39,7 +39,7 @@ int	check_error(char *s)
 	return (s[j] == '\0' && !(neg == 1 && dig == 0));
 }
 
-long	ft_atoi(char *s)
+long	ft_atol(char *s)
 {
 	long	i;
 	long	sign;
@@ -83,13 +83,13 @@ int	init_table(t_table *table, int ac, char **av)
 	}
 	table->simulation_end_time = 0;
 	table->all_eaten = 1;
-	table->num_philos = ft_atoi(av[1]);
-	table->time_to_die = ft_atoi(av[2]);
-	table->time_to_eat = ft_atoi(av[3]);
-	table->time_to_sleep = ft_atoi(av[4]);
+	table->num_philos = ft_atol(av[1]);
+	table->time_to_die = ft_atol(av[2]);
+	table->time_to_eat = ft_atol(av[3]);
+	table->time_to_sleep = ft_atol(av[4]);
 	table->num_to_eat = -1;
 	if (ac == 6)
-		table->num_to_eat = ft_atoi(av[5]);
+		table->num_to_eat = ft_atol(av[5]);
 	if (table->num_philos <= 0 || table->time_to_die <= 0 || \
 		table->time_to_eat <= 0 || table->time_to_sleep <= 0 || \
 		table->num_to_eat == 0 || table->num_to_eat < -1)

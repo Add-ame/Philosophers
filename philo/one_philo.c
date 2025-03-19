@@ -2,15 +2,20 @@
 
 void	*one_thread(void	*data)
 {
-	t_philo		*p;
 	long		start;
+	long		time;
+	t_table		*table;
+	struct timeval		current_time;
 
-	p = (t_philo *)data;
-	start = get_time(p, CURRENT_TIME);
+	table = (t_table *)data;
+	gettimeofday(&current_time, NULL);
+	start = (current_time.tv_sec * 1000) + (current_time.tv_usec / 1000);
 	printf("%d %d is thinking\n", 0, 1);
 	printf("%d %d has taken a fork\n", 0, 1);
-	usleep(p->table->time_to_die * 1000);
-	printf("%ld %d died\n", get_time(p, CURRENT_TIME) - start, 1);
+	usleep(table->time_to_die * 1000);
+	gettimeofday(&current_time, NULL);
+	time = (current_time.tv_sec * 1000) + (current_time.tv_usec / 1000);
+	printf("%ld %d died\n", time - start, 1);
 	return (NULL);
 }
 
@@ -18,7 +23,7 @@ int	one_philo(t_table *table)
 {
 	pthread_t	thread_id;
 
-	if (pthread_create(&thread_id, NULL, one_thread, &table) == ERROR)
+	if (pthread_create(&thread_id, NULL, one_thread, table) == ERROR)
 		return (ERROR);
 	if (pthread_join(thread_id, NULL) == ERROR)
 		return (ERROR);
