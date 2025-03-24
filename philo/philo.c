@@ -64,22 +64,6 @@ int	eating(t_philo *p)
 	return (0);
 }
 
-int	_printf(t_philo *p, char *s)
-{
-	pthread_mutex_lock(p->print);
-	pthread_mutex_lock(p->checking);
-	if (p->table->simulation_end_time)
-	{
-		pthread_mutex_unlock(p->checking);
-		pthread_mutex_unlock(p->print);
-		return (SIMULATION_END);
-	}
-	pthread_mutex_unlock(p->checking);
-	printf("%ld %d %s\n", get_time(p, DIFF_START_TO_NEW), p->idx, s);
-	pthread_mutex_unlock(p->print);
-	return (0);
-}
-
 void	*philo_thread(void *data)
 {
 	t_philo	*p;
@@ -89,15 +73,40 @@ void	*philo_thread(void *data)
 		usleep(1000);
 	while (1)
 	{
-		if (_printf(p, "is thinking") == SIMULATION_END)
+		if (ft_print(p, "is thinking", THINK) == SIMULATION_END)
 			break ;
 		if (eating(p) == SIMULATION_END)
 			break ;
-		if (_printf(p, "is sleeping") == SIMULATION_END)
+		if (ft_print(p, "is sleeping", SLEEP) == SIMULATION_END)
 			break ;
 		usleep(p->table->time_to_sleep * 1000);
 	}
 	return (NULL);
+}
+
+int	create_threads(t_philo *p, t_table *table)
+{
+	pthread_t	id;
+	int			i;
+
+	i = 0;
+	while (i < table->num_philos)
+	{
+		init(&p[i], i, table);
+		p[i].right_fork = &p[(i + 1) % table->num_philos].left_fork;
+		if (pthread_create(&p[i].t_id, NULL, philo_thread, &p[i]) != SUCESS)
+			return (ERROR);
+		i++;
+	}
+	pthread_create(&id, NULL, monitoring, p);
+	pthread_join(id, NULL);
+	i = -1;
+	while (++i < table->num_philos)
+	{
+		if (pthread_join(p[i].t_id, NULL) != SUCESS)
+			return (ERROR);
+	}
+	return (SUCESS);
 }
 
 int	main(int ac, char **av)

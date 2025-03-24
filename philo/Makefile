@@ -1,7 +1,7 @@
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -g
-SRCS = get_time.c create_threads.c  init.c  one_philo.c  philo.c
-OBJS = get_time.o create_threads.o  init.o  one_philo.o  philo.o
+SRCS = get_time.c monitoring.c  init.c  one_philo.c  philo.c clean.c
+OBJS = get_time.o monitoring.o  init.o  one_philo.o  philo.o clean.o
 
 NAME = philo
 

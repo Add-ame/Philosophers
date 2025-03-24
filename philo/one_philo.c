@@ -21,11 +21,11 @@ void	*one_thread(void	*data)
 
 int	one_philo(t_table *table)
 {
-	pthread_t	thread_id;
+	pthread_t	t_id;
 
-	if (pthread_create(&thread_id, NULL, one_thread, table) == ERROR)
+	if (pthread_create(&t_id, NULL, one_thread, table) == ERROR)
 		return (ERROR);
-	if (pthread_join(thread_id, NULL) == ERROR)
+	if (pthread_join(t_id, NULL) == ERROR)
 		return (ERROR);
 	free(table);
 	return (0);

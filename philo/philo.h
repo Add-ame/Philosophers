@@ -40,7 +40,9 @@ typedef enum s_enum
 	DIFF_START_TO_NEW,
 	DIFF_LAST_TO_NEW,
 	FIRST_FORK,
-	BOTH_FORKS
+	BOTH_FORKS,
+	THINK,
+	SLEEP
 }	t_enum;
 
 typedef struct s_table
@@ -71,30 +73,25 @@ typedef struct s_philo
 	t_mutex		*last_meal;
 	t_mutex		left_fork;
 	t_mutex		*right_fork;
-	pthread_t	thread_id;
+	pthread_t	t_id;
 }	t_philo;
 
-void	*philo_thread(void *data);
-
-/*                    init                    */
+/*                     init                          */
 int		init_table(t_table *table, int ac, char **av);
 void	init(t_philo *p, int i, t_table *pl);
 int		init_mutexes(t_philo *p, t_table *table);
 
-/*                     clean                         */
+/*                     clean                        */
 int		clean(t_philo *p, t_table *table);
 
-/*                     check_philo                         */
-void	*monitor(void *data);
+/*                     check_philo                  */
+void	*monitoring(void *data);
 
-/*                     check_philo                         */
+/*                     check_philo                  */
 void	*one_thread(void	*data);
 int		one_philo(t_table *table);
 
-/*                     create_threads                         */
-int		create_threads(t_philo *p, t_table *table);
-
-/*                    philo_utils                  */
+/*                     get_time                     */
 long	get_time(t_philo *p, int flag);
 
 #endif
