@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   philo.h                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: maddame <maddame@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/06 15:52:59 by maddame           #+#    #+#             */
-/*   Updated: 2025/03/16 17:45:40 by maddame          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef PHILO_H
 # define PHILO_H
 
@@ -93,5 +81,9 @@ int		one_philo(t_table *table);
 
 /*                     get_time                     */
 long	get_time(t_philo *p, int flag);
+
+/*                     lock_fork                    */
+void	unlock_fork(t_philo *p, int flag);
+void	lock_fork(t_philo *p, int flag);
 
 #endif

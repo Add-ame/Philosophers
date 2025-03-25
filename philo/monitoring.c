@@ -7,8 +7,11 @@ void	*die(t_philo *p, int i)
 	get_time(&p[i], DIFF_START_TO_NEW);
 	pthread_mutex_unlock(p[i].checking);
 	pthread_mutex_lock(p[i].print);
-	printf("%ld %d died\n", p[i].table->simulation_end_time, \
-	p[i].idx);
+	pthread_mutex_lock(p->last_meal);
+	if (p->meals_eaten != p->table->num_to_eat)
+		printf("%ld %d died\n", p[i].table->simulation_end_time, \
+		p[i].idx);
+	pthread_mutex_unlock(p->last_meal);
 	pthread_mutex_unlock(p[i].print);
 	return (NULL);
 }

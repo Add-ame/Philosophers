@@ -2,10 +2,10 @@
 
 void	*one_thread(void	*data)
 {
-	long		start;
-	long		time;
-	t_table		*table;
 	struct timeval		current_time;
+	long				start;
+	long				time;
+	t_table				*table;
 
 	table = (t_table *)data;
 	gettimeofday(&current_time, NULL);
